@@ -21,7 +21,7 @@ const JobModal = ({ jobTitle, candidates, onClose }) => {
 	);
 };
 
-const JobLink = ({ jobTitle, jobID }) => {
+const JobLink = ({ jobTitle, job }) => {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [candidates, setCandidates] = useState([]);
 	const [applyFormOpen, setApplyFormOpen] = useState(false);
@@ -29,7 +29,7 @@ const JobLink = ({ jobTitle, jobID }) => {
 	const openModal = async () => {
 		// Simulate fetching candidates for the specific job (replace with your actual API endpoint)
 		try {
-			const appData = await axios.get('http://localhost:8000/applications?id=' + jobID);
+			const appData = await axios.get('http://localhost:8000/applications?id=' + job.jobID);
 			setCandidates(appData.data);
 			setModalOpen(true);
 		} catch (error) {
@@ -46,7 +46,7 @@ const JobLink = ({ jobTitle, jobID }) => {
 	const closeApplyForm = () => setApplyFormOpen(false);
 
 	const handleApply = async (applicationData) => {
-		applicationData.jobID = jobID;
+		applicationData.job = job;
 		const response = await axios.put('http://localhost:8000/apply', applicationData);
 		// Handle the application data (e.g., send it to the server)
 		alert('Application submitted');

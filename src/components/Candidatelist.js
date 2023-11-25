@@ -6,7 +6,7 @@ const Candidate = () => {
 	const fetchData = async () => {
 		const candidatesData = await axios.get('http://localhost:8000/candidates');
 
-		setCandidates(candidatesData.data.candidates.values);
+		setCandidates(candidatesData.data);
 	};
 
 	useEffect(() => {
@@ -21,7 +21,7 @@ const Candidate = () => {
 					<p>{entry.email}</p>
 					<p>{entry.skills?.map(element => <span class={"tag tag-" + entry.candidate_id}>{element}</span>)}</p>
 					<p class="card__apply">
-						<a class="card__link" href="#">{entry.resume_link} <i class="fas fa-arrow-right"></i></a>
+						<a class="card__link" href="#">{entry.resume_link || entry.resume} <i class="fas fa-arrow-right"></i></a>
 					</p>
 				</div>
 			</div>)}

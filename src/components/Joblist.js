@@ -25,7 +25,7 @@ const Joblist = () => {
 					<p>{burger.description}</p>
 					<p>{burger.location}</p>
 					<p>{burger.salary}</p>
-					<Joblink key={burger.jobID} jobTitle={burger.positionTitle} jobID={burger.jobID} />
+					<Joblink key={burger.jobID} jobTitle={burger.positionTitle} job={burger} />
 				</div>
 			)
 			}
