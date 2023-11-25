@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Joblink from './Applist.js';
 
+
 const Joblist = () => {
 	const [burgers, setBurgers] = useState(null);
 
@@ -14,6 +15,7 @@ const Joblist = () => {
 	useEffect(() => {
 		fetchData();
 	}, []);
+	
 
 	return (
 		<div class="cards">
@@ -23,9 +25,6 @@ const Joblist = () => {
 					<p>{burger.description}</p>
 					<p>{burger.location}</p>
 					<p>{burger.salary}</p>
-					<p class="card__apply">
-						<a class="card__link" href="#">Apply Now <i class="fas fa-arrow-right"></i></a>
-					</p>
 					<Joblink key={burger.jobID} jobTitle={burger.positionTitle} jobID={burger.jobID} />
 				</div>
 			)
