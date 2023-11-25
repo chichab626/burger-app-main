@@ -140,19 +140,19 @@ h1 {
   
   /* CARD BACKGROUNDS */
   
-  .card-1 {
+  .card-1, .card-6 {
 	background: radial-gradient(#1fe4f5, #3fbafe);
   }
   
-  .card-2 {
+  .card-2, .card-7 {
 	background: radial-gradient(#fbc1cc, #fa99b2);
   }
   
-  .card-3 {
+  .card-3, .card-8 {
 	background: radial-gradient(#76b2fe, #b69efe);
   }
   
-  .card-4 {
+  .card-4, .card-9 {
 	background: radial-gradient(#60efbc, #58d5c9);
   }
   
@@ -171,19 +171,19 @@ h1 {
 	margin-left: .5em;
   }
   
-  .tag-2 {
+  .tag-2, .tag-4, .tag-6 {
 	background: #56CCF2;
   background: linear-gradient(to bottom, #2F80ED, #56CCF2);
 	color: #fafafa;
   }
   
-  .tag-3 {
+  .tag-3, .tag-7, .tag-9 {
 	background: #D1913C;
   background: linear-gradient(to bottom, #FFD194, #D1913C);
 	color: #fafafa;
   }
   
-  .tag-1 {
+  .tag-1 ,.tag-5, .tag-8{
 	background: #cb2d3e;
   background: linear-gradient(to bottom, #ef473a, #cb2d3e);
 	color: #fafafa;
