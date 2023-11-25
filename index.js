@@ -85,6 +85,8 @@ app.get('/candidates', (req, res) => {
 			for (let record of records) {
 				let entry = record.get('c').properties;
 				if (entry.skills) entry.skills = entry.skills.split(',')
+				entry.candidate_id = (entry.candidateID.low != undefined) ? entry.candidateID.low : entry.candidateID
+				entry.resume_link = entry.resume
 				data.push(entry);
 			}
 
@@ -139,9 +141,9 @@ app.put("/apply", async (req, res) => {
 
 		// create candidate
 		await driver.executeQuery(`
-		MERGE (p:Candidate {candidateID: $newID, name: $name, email : $email, resume:$resume})
+		MERGE (p:Candidate {candidateID: $newID, name: $name, email : $email, resume:$resume, skills : $skills})
 		RETURN p.candidateID AS candidateID
-		`, { newID: newID, name: req.body.name, email: req.body.email, resume: req.body.resumeLink }
+		`, { newID: newID, name: req.body.name, email: req.body.email, resume: req.body.resumeLink, skills:req.body.skills }
 		);
 
 		let job = req.body.job;
