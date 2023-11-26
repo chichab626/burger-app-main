@@ -1,4 +1,4 @@
-# Burger App
+# Job Board
 
 This project was built for a demo on using a Document API and Express.js.
 
