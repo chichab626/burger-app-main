@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
+import Badge from 'react-bootstrap/Badge';
+import Stack from 'react-bootstrap/Stack';
+import { ListGroup } from 'react-bootstrap';
+
 const Candidate = () => {
 	const [candidates, setCandidates] = useState(null);
 
@@ -11,21 +20,30 @@ const Candidate = () => {
 
 	useEffect(() => {
 		fetchData();
-	}, []);
+	});
 
 	return (
-		<div className="cards">
-			{candidates?.map(entry => <div key={entry.candidate_id} >
-				<div class={"card card-" + entry.candidate_id}>
-					<h2 class="card__title">{entry.name}</h2>
-					<p>{entry.email}</p>
-					<p>{entry.skills?.map(element => <span class={"tag tag-" + entry.candidate_id}>{element}</span>)}</p>
-					<p class="card__apply">
-						<a class="card__link" href="#">{entry.resume_link || entry.resume} <i class="fas fa-arrow-right"></i></a>
-					</p>
-				</div>
-			</div>)}
-		</div>
+		<Container>
+			<Row xs={1} md={3} className="g-4">
+				{candidates?.map((entry, idx) =>
+					<Col key={idx}>
+						<Card style={{ width: '25rem', backgroundColor: '#fff3cd' }}>
+							<Card.Body>
+								<Card.Title>{entry.name}</Card.Title>
+								<Card.Subtitle className="mb-2 text-muted">{entry.email}</Card.Subtitle>
+								<ListGroup variant="flush">
+									<ListGroup.Item>{entry.resume_link || entry.resume}</ListGroup.Item>
+									<ListGroup.Item>
+										<Stack direction="horizontal" gap={2}>
+											{entry.skills?.map(element => <Badge pill bg="primary">{element}</Badge>)}
+										</Stack>
+									</ListGroup.Item>
+								</ListGroup>
+							</Card.Body>
+						</Card></Col>
+				)}
+			</Row>
+		</Container>
 
 	);
 };

@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Joblink from './Applist.js';
 
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { Container } from 'react-bootstrap';
+
 
 const Joblist = () => {
 	const [burgers, setBurgers] = useState(null);
@@ -15,22 +20,28 @@ const Joblist = () => {
 	useEffect(() => {
 		fetchData();
 	}, []);
-	
+
 
 	return (
-		<div class="cards">
-			{burgers?.map(burger =>
-				<div class={"card card-" + burger.jobID}>
-					<h2 class="card__title">{burger.positionTitle}</h2>
-					<p>{burger.description}</p>
-					<p>{burger.location}</p>
-					<p>{burger.salary}</p>
-					<Joblink key={burger.jobID} jobTitle={burger.positionTitle} job={burger} />
-				</div>
-			)
-			}
+		<Container>
+			<Row xs={1} md={2} className="g-4">
+				{burgers?.map((burger, idx) =>
+					<Col key={idx}>
+						<Card style={{ width: '40rem', backgroundColor: '#a3cfbb' }}>
+							<Card.Body>
+								<Card.Title>{burger.positionTitle}</Card.Title>
+								<Card.Subtitle className="mb-2 text-muted">{burger.salary}</Card.Subtitle>
+								<Card.Text>
+									{burger.description}
+								</Card.Text>
 
-		</div>
+								<Joblink key={burger.jobID} jobTitle={burger.positionTitle} job={burger} />
+							</Card.Body>
+						</Card></Col>
+				)}
+			</Row>
+		</Container>
+
 
 	);
 };

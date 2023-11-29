@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Container from 'react-bootstrap/Container';
+import { ListGroup } from 'react-bootstrap';
+
 const Employer = () => {
 	const [employers, setEmployers] = useState(null);
 
 	const fetchData = async () => {
 		const data = await axios.get('http://localhost:8000/employers');
-		
-		setEmployers(data.data)
+
+		setEmployers(data.data);
 	};
 
 	useEffect(() => {
@@ -14,18 +21,23 @@ const Employer = () => {
 	}, []);
 
 	return (
-		<div className="cards">
-			{employers?.map((entry,idx) => <div key={entry.employer_id} >
-				<div class={"card card-" + (idx+1)}>
-					<h2 class="card__title">{entry.company_name}</h2>
-					<p>{entry.email}</p>
-					<p>{entry.location}</p>
-					<p class="card__apply">
-						<a class="card__link" href="#">View Jobs <i class="fas fa-arrow-right"></i></a>
-					</p>
-				</div>
-			</div>)}
-		</div>
+
+		<Container>
+			<Row xs={1} md={3} className="g-4">
+				{employers?.map((entry, idx) =>
+					<Col key={idx}>
+						<Card style={{ width: '25rem', backgroundColor: 'pink' }}>
+							<Card.Body>
+								<Card.Title>{entry.company_name}</Card.Title>
+								<Card.Subtitle className="mb-2 text-muted">{entry.location}</Card.Subtitle>
+								<ListGroup variant="flush">
+									<ListGroup.Item>{entry.email}</ListGroup.Item>
+								</ListGroup>
+							</Card.Body>
+						</Card></Col>
+				)}
+			</Row>
+		</Container>
 	);
 };
 

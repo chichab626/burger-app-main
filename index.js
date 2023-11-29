@@ -1,10 +1,23 @@
 const PORT = 8000;
-import express from "express";
-import cors from "cors";
-import morgan from "morgan";
-import fetch from "node-fetch";
-import dotenv from "dotenv";
-import neo4j from "neo4j-driver";
+// import express from "express";
+// import cors from "cors";
+// import morgan from "morgan";
+// import fetch from "node-fetch";
+// import dotenv from "dotenv";
+// import getNeo4jDriver from "./util.js";
+//import {getMergedCandidates, getEmployersDTX} from "./query.js";
+
+const express = require("express");
+const cors = require("cors");
+const morgan = require("morgan");
+
+const dotenv = require("dotenv");
+const getNeo4jDriver = require("./util.js").getNeo4jDriver;
+const getMergedCandidates = require("./query").getMergedCandidates;
+const getEmployersDTX = require("./query").getEmployersDTX;
+
+
+
 
 dotenv.config();
 
@@ -30,102 +43,24 @@ app.get('/jobs', (req, res) => {
 		.catch(err => console.log('error:' + err));
 });
 
-app.get('/candidates', (req, res) => {
-	const query = `
-		query {
-		candidates(value: { }) {
-		  values {
-			candidate_id
-			name
-			email
-			skills
-		   resume_link
-		  }
-		}
-	  }
-	  
-    `;
-
-	const url = process.env.ENDPOINT_GQL;
-	const options = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'x-cassandra-token': process.env.ASTRA_TOKEN_GQL
-		},
-		body: JSON.stringify({ query })
-	};
-	fetch(url, options)
-		.then(response => response.json())
-		.then(async (json) => {
-
-
-			const URI = process.env.NEO4J_URI;
-			const USER = process.env.NEO4J_USERNAME;
-			const PASSWORD = process.env.NEO4J_PASSWORD;
-			let driver;
-
-			try {
-				driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-				const serverInfo = await driver.getServerInfo();
-				console.log('Connection estabilished');
-				console.log(serverInfo);
-			} catch (err) {
-				console.log(`Connection error\n${err}\nCause: ${err.cause}`);
-				await driver.close();
-				return;
-			}
-
-			// Use the driver to run queries
-			let { records, summary } = await driver.executeQuery(
-				`MATCH (c:Candidate) RETURN c`
-			);
-
-			let data = [];
-			for (let record of records) {
-				let entry = record.get('c').properties;
-				if (entry.skills) entry.skills = entry.skills.split(',')
-				entry.candidate_id = (entry.candidateID.low != undefined) ? entry.candidateID.low : entry.candidateID
-				entry.resume_link = entry.resume
-				data.push(entry);
-			}
-
-			return res.json(json.data.candidates.values.concat(data));
-		})
-		.catch(err => console.log('error:' + err));
+app.get('/candidates', async (req, res) => {
+	let result = await getMergedCandidates();
+	res.send(result)
 });
 
-app.get('/employers', (req, res) => {
-	const query = `
-	select * from tabular.employer;
-    `;
+app.get('/employers', async (req, res) => {
 
-	const url = process.env.ENDPOINT_TBL;
-	const options = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'text/plain',
-			'x-cassandra-token': process.env.ASTRA_TOKEN_TBL
-		},
-		body: query
-	};
-	fetch(url, options)
-		.then(response => response.json())
-		.then(json => res.json(json.data))
-		.catch(err => console.log('error:' + err));
+	let data = await getEmployersDTX();
+	res.json(data);
 });
 
 app.put("/apply", async (req, res) => {
 	let result;
 	let newID;
-
-	const URI = process.env.NEO4J_URI;
-	const USER = process.env.NEO4J_USERNAME;
-	const PASSWORD = process.env.NEO4J_PASSWORD;
 	let driver;
 
 	try {
-		driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
+		driver = await getNeo4jDriver();
 
 		// Obtain most recent candidate id
 		result = await driver.executeQuery(`
@@ -147,8 +82,6 @@ app.put("/apply", async (req, res) => {
 		);
 
 		let job = req.body.job;
-		console.log(JSON.stringify(job, null, 2))
-
 
 		// create relationship
 		await driver.executeQuery(`
@@ -162,8 +95,6 @@ app.put("/apply", async (req, res) => {
 			salary: job.salary, jobType: job.jobType, status: job.status, candidateID: newID, employerID: job.employerID
 		}
 		);
-
-		console.log('created rel job')
 
 		// create relationship
 		await driver.executeQuery(`
@@ -182,28 +113,14 @@ app.put("/apply", async (req, res) => {
 		return;
 	}
 
-	await driver.close();
+	driver.close();
 	res.send({created : newID});
 });
 
 app.get('/applications', async (req, res) => {
 	const jobID = req.query.id || 1;
 
-	const URI = process.env.NEO4J_URI;
-	const USER = process.env.NEO4J_USERNAME;
-	const PASSWORD = process.env.NEO4J_PASSWORD;
-	let driver;
-
-	try {
-		driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD));
-		const serverInfo = await driver.getServerInfo();
-		console.log('Connection estabilished');
-		console.log(serverInfo);
-	} catch (err) {
-		console.log(`Connection error\n${err}\nCause: ${err.cause}`);
-		await driver.close();
-		return;
-	}
+	let driver = await getNeo4jDriver();
 
 	// Use the driver to run queries
 	let { records, summary } = await driver.executeQuery(
@@ -221,7 +138,7 @@ app.get('/applications', async (req, res) => {
 	}
 
 
-	await driver.close();
+	driver.close();
 	res.json(data);
 });
 
