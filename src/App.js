@@ -21,13 +21,13 @@ const App = () => {
 				className="mb-3"
 				fill
 			>
-				<Tab eventKey="jobs" title="Jobs">
+				<Tab eventKey="jobs" title="Job List">
 					<Joblist />
 				</Tab>
-				<Tab eventKey="candidates" title="candidates">
+				<Tab eventKey="candidates" title="Candidate List">
 					<Candidatelist />
 				</Tab>
-				<Tab eventKey="employers" title="employers">
+				<Tab eventKey="employers" title="Employer List">
 					<Employerlist />
 				</Tab>
 			</Tabs>
