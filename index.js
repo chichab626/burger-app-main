@@ -43,6 +43,38 @@ app.get('/jobs', (req, res) => {
 		.catch(err => console.log('error:' + err));
 });
 
+// Endpoint to add a new job
+app.post('/add-job/:employerId', async (req, res) => {
+	const { employerId } = req.params;
+	const { positionTitle, description, salary } = req.body;
+    
+	// Create the job object
+	const newJob = {
+	  jobID: require('crypto').randomUUID(),
+	  employerID : employerId,
+	  positionTitle,
+	  description,
+	  salary
+	};
+  
+	// Add the job
+	const url = process.env.ENDPOINT;
+
+	const options = {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			'X-Cassandra-Token': process.env.ASTRA_TOKEN
+		},
+		body : JSON.stringify(newJob)
+	};
+
+	await fetch(url, options)
+  
+	return res.status(201).json({ success: true, message: 'Job added successfully', job: newJob });
+  });
+
 app.get('/candidates', async (req, res) => {
 	let result = await getMergedCandidates();
 	res.send(result)

@@ -20,7 +20,7 @@ const Candidate = () => {
 
 	useEffect(() => {
 		fetchData();
-	});
+	},[]);
 
 	return (
 		<Container>

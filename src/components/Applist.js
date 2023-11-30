@@ -21,7 +21,7 @@ function ViewApplicantsModal(props) {
 
 	useEffect(() => {
 		fetchData();
-	});
+	},[]);
 
 	return (
 		<Modal
@@ -64,7 +64,7 @@ const JobLink = ({ jobTitle, job }) => {
 	const handleApply = async (e) => {
 		let applicationData = { name, email, resumeLink, skills, job };
 		// applicationData.job = job;
-		await axios.put('http://localhost:8000/apply', applicationData);
+		await axios.post('http://localhost:8000/apply', applicationData);
 		// Handle the application data (e.g., send it to the server)
 		alert("Application Submitted");
 		handleClose();
