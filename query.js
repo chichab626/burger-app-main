@@ -45,7 +45,7 @@ const getCandidatesFromNeo = async () => {
 	for (let record of records) {
 		let entry = record.get('c').properties;
 		if (entry.skills) entry.skills = entry.skills.split(',');
-		entry.candidate_id = (entry.candidateID.low != undefined) ? entry.candidateID.low : entry.candidateID;
+		entry.candidate_id = (entry.candidateID && entry.candidateID.low) ? entry.candidateID.low : entry.candidateID;
 		entry.resume_link = entry.resume;
 		data.push(entry);
 	}

@@ -50,7 +50,7 @@ app.post('/add-job/:employerId', async (req, res) => {
     
 	// Create the job object
 	const newJob = {
-	  jobID: require('crypto').randomUUID(),
+	  jobID: require('node:crypto').randomInt(50000),
 	  employerID : employerId,
 	  positionTitle,
 	  description,
@@ -86,32 +86,34 @@ app.get('/employers', async (req, res) => {
 	res.json(data);
 });
 
-app.put("/apply", async (req, res) => {
+app.post("/apply", async (req, res) => {
 	let result;
-	let newID;
+	let newID = require('node:crypto').randomInt(50000);
 	let driver;
 
 	try {
 		driver = await getNeo4jDriver();
 
-		// Obtain most recent candidate id
+		// Obtain candidate if email already exists
 		result = await driver.executeQuery(`
-			MATCH (o:Candidate)
-			RETURN o.candidateID as id
-			ORDER BY o.candidateID DESC
-			LIMIT 1
-		`);
+			MERGE (c:Candidate {email: $email})
+			ON CREATE
+				SET c.candidateID = $newID, c.name = $name, c.resume=$resume, c.skills = $skills, c.email = $email
+			ON MATCH
+				SET c.name = $name, c.resume=$resume, c.skills = $skills, c.email = $email
+			RETURN c.candidateID as id
+		`, { newID: newID, name: req.body.name, email: req.body.email, resume: req.body.resumeLink, skills:req.body.skills });
 		if (result.records.length > 0) {
 			console.log(JSON.stringify(result.records[0].get('id'), null, 2));
-			newID = parseInt(result.records[0].get('id')) + 1;
+			newID = parseInt(result.records[0].get('id'));
 		}
 
-		// create candidate
-		await driver.executeQuery(`
-		MERGE (p:Candidate {candidateID: $newID, name: $name, email : $email, resume:$resume, skills : $skills})
-		RETURN p.candidateID AS candidateID
-		`, { newID: newID, name: req.body.name, email: req.body.email, resume: req.body.resumeLink, skills:req.body.skills }
-		);
+		// // create candidate
+		// await driver.executeQuery(`
+		// MERGE (p:Candidate {candidateID: $newID, name: $name, email : $email, resume:$resume, skills : $skills})
+		// RETURN p.candidateID AS candidateID
+		// `, { newID: newID, name: req.body.name, email: req.body.email, resume: req.body.resumeLink, skills:req.body.skills }
+		// );
 
 		let job = req.body.job;
 
@@ -123,22 +125,22 @@ app.put("/apply", async (req, res) => {
 			MERGE (p)-[r:APPLIES_FOR]->(o)
 			RETURN p.candidateID AS id
 			`, {
-			jobID: job.jobID, title: job.positionTitle, desc: job.description, location: job.location,
-			salary: job.salary, jobType: job.jobType, status: job.status, candidateID: newID, employerID: job.employerID
+			jobID: job.jobID, title: job.positionTitle, desc: job.description, location: job.location || 'unspecified',
+			salary: job.salary, jobType: job.jobType || 'Full-Time', status: job.status || 'open', candidateID: newID, employerID: job.employerID
 		}
 		);
 
-		// create relationship
-		await driver.executeQuery(`
-			MATCH (o:Job {jobID: $jobID})
-			MATCH (e:Employer {employerID: $employerID})
-			MERGE (e)-[y:POSTS]->(o)
-			RETURN o.jobID AS id
-			`, {
-			jobID: job.jobID, title: job.positionTitle, desc: job.description, location: job.location,
-			salary: job.salary, jobType: job.jobType, status: job.status, candidateID: newID, employerID: job.employerID
-		}
-		);
+		// // create relationship
+		// await driver.executeQuery(`
+		// 	MATCH (o:Job {jobID: $jobID})
+		// 	MATCH (e:Employer {employerID: $employerID})
+		// 	MERGE (e)-[y:POSTS]->(o)
+		// 	RETURN o.jobID AS id
+		// 	`, {
+		// 	jobID: job.jobID, title: job.positionTitle, desc: job.description, location: job.location,
+		// 	salary: job.salary, jobType: job.jobType, status: job.status, candidateID: newID, employerID: job.employerID
+		// }
+		// );
 	} catch (err) {
 		console.log(`Connection error\n${err}\nCause: ${err.cause}`);
 		await driver.close();
@@ -150,7 +152,11 @@ app.put("/apply", async (req, res) => {
 });
 
 app.get('/applications', async (req, res) => {
-	const jobID = req.query.id || 1;
+	let jobID = req.query.id || 1;
+
+	// if (typeof jobID === 'string' || jobID instanceof String) {
+	// 	jobID = `'${jobID}'`
+	// }
 
 	let driver = await getNeo4jDriver();
 

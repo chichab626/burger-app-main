@@ -62,6 +62,7 @@ const JobLink = ({ jobTitle, job }) => {
 	const [skills, setSkills] = useState('');
 
 	const handleApply = async (e) => {
+		e.preventDefault();
 		let applicationData = { name, email, resumeLink, skills, job };
 		// applicationData.job = job;
 		await axios.post('http://localhost:8000/apply', applicationData);
