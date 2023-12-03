@@ -24,10 +24,10 @@ const Joblist = () => {
 
 	return (
 		<Container>
-			<Row xs={1} md={2} className="g-4">
+			<Row xs={1} md={1} className="g-4">
 				{burgers?.map((burger, idx) =>
 					<Col key={idx}>
-						<Card style={{ width: '40rem', backgroundColor: '#a3cfbb' }}>
+						<Card style={{ width: '70rem', backgroundColor: '#a3cfbb' }}>
 							<Card.Body>
 								<Card.Title>{burger.positionTitle}</Card.Title>
 								<Card.Subtitle className="mb-2 text-muted">{burger.salary}</Card.Subtitle>

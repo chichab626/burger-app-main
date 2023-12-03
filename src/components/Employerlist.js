@@ -41,10 +41,10 @@ const Employer = () => {
 	return (
 		<>
 			<Container>
-				<Row xs={1} md={3} className="g-4">
+				<Row xs={1} md={2} className="g-4">
 					{employers?.map((entry, idx) =>
 						<Col key={idx}>
-							<Card style={{ width: '25rem', backgroundColor: 'pink' }}>
+							<Card style={{ width: '35rem', backgroundColor: 'pink' }}>
 								<Card.Body>
 									<Card.Title>{entry.company_name}</Card.Title>
 									<Card.Subtitle className="mb-2 text-muted">{entry.location}</Card.Subtitle>

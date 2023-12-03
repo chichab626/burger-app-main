@@ -27,7 +27,7 @@ const Candidate = () => {
 			<Row xs={1} md={3} className="g-4">
 				{candidates?.map((entry, idx) =>
 					<Col key={idx}>
-						<Card style={{ width: '25rem', backgroundColor: '#fff3cd' }}>
+						<Card style={{ width: '20rem', backgroundColor: '#fff3cd' }}>
 							<Card.Body>
 								<Card.Title>{entry.name}</Card.Title>
 								<Card.Subtitle className="mb-2 text-muted">{entry.email}</Card.Subtitle>
